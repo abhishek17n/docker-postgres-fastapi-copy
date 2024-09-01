@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    depends_on:
+      - postgres
+    volumes:
+      - ./:/code:ro
+    environment:
+      - DATABASE_HOSTNAME=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=dockert
+      - DATABASE_USERNAME=postgres
+    ports:
+      - "8000:80"
+
+  postgres:
+      image: postgres
+      restart: unless-stopped
+      container_name: postgres
+      hostname: postgres
+      volumes:
+        - ./db:/var/lib/postgresql/data
+        - ./init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      ports:
+        - "5432:5432"
+      environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_DB=dockert
+
+volumes:
+  db:
+    driver: local
